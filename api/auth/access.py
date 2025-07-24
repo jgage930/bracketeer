@@ -6,7 +6,7 @@ from sqlalchemy import select
 from api.database import AccessLevel, db_session
 
 
-access_router = APIRouter(prefix="/access")
+access_router = APIRouter(prefix="/access", tags=["access"])
 
 
 class AccessLevelCreate(BaseModel):
