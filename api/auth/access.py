@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy import select
 
-from api.database import AccessLevel, db_session
+from api.database import AccessLevel, Database
 
 
 access_router = APIRouter(prefix="/access", tags=["access"])
@@ -53,14 +53,12 @@ async def delete_access_level(db: AsyncSession, access_level_id: int) -> bool:
 
 
 @access_router.post("")
-async def create_access(
-    access: AccessLevelCreate, db: AsyncSession = Depends(db_session)
-):
+async def create_access(access: AccessLevelCreate, db: Database):
     return await create_access_level(db, access)
 
 
 @access_router.get("/{id}", response_model=AccessLevelRead)
-async def get_access_by_id(id: int, db: AsyncSession = Depends(db_session)):
+async def get_access_by_id(id: int, db: Database):
     access = await get_access_level(db, id)
     if not access:
         raise HTTPException(status_code=404, detail="Access level not found")
@@ -68,12 +66,12 @@ async def get_access_by_id(id: int, db: AsyncSession = Depends(db_session)):
 
 
 @access_router.get("/", response_model=list[AccessLevelRead])
-async def list_all_accesses(db: AsyncSession = Depends(db_session)):
+async def list_all_accesses(db: Database):
     return await get_all_access_levels(db)
 
 
 @access_router.delete("/{id}")
-async def delete_access(id: int, db: AsyncSession = Depends(db_session)):
+async def delete_access(id: int, db: Database):
     success = await delete_access_level(db, id)
     if not success:
         raise HTTPException(status_code=404, detail="Access level not found")

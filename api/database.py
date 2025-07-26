@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 
+from fastapi import Depends
 from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -9,6 +10,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import Annotated
 import asyncio
 import logging
 
@@ -42,6 +44,8 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
             await session.rollback()
             raise DatabaseException("Failed to get session.") from e
 
+
+Database = Annotated[AsyncSession, Depends(db_session)]
 
 # DB Models
 
