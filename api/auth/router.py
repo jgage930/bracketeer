@@ -3,8 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from .access import access_router
-from .user import user_router
 
 fake_users_db = {
     "johndoe": {
@@ -29,9 +27,7 @@ def fake_hash_password(password: str):
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-auth_router = APIRouter()
-auth_router.include_router(access_router)
-auth_router.include_router(user_router)
+auth_router = APIRouter(tags=["auth"])
 
 
 class User(BaseModel):
