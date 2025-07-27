@@ -1,13 +1,16 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy import select
 
-from api.database import Database
+from api.auth.encrypt import hash_password
+from api.database import Database, User
 
 
-user_router = APIRouter(prefix="user", tags=["user"])
+user_router = APIRouter(prefix="/user", tags=["user"])
 
 
-class RegisterUser(BaseModel):
+class UserCreate(BaseModel):
     username: str
     email: str
     password: str
@@ -23,6 +26,26 @@ class UserRead(BaseModel):
         orm_mode = True
 
 
-@user_router.post("/register")
-async def register_new_user(user: RegisterUser, db: Database):
-    pass
+# CRUD
+async def create_user(db: AsyncSession, user_data: UserCreate) -> User:
+    user = User(
+        username=user_data.username,
+        email=user_data.email,
+        password_hash=hash_password(user_data.password),
+        access_level_id=1,
+    )
+
+    db.add(user)
+    await db.flush()
+    return user
+
+
+async def get_user(db: AsyncSession, user_id: int) -> User | None:
+    result = await db.execute(select(User).where(User.id == user_id))
+    return result.scalar_one_or_none()
+
+
+@user_router.post("", response_model=UserRead)
+async def register_new_user(user: UserCreate, db: Database):
+    user = await create_user(db, user)
+    return UserRead.model_validate(user)
