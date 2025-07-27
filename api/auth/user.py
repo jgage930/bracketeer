@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy import select
@@ -47,7 +48,29 @@ async def get_user(db: AsyncSession, user_id: int) -> User | None:
     return result.scalar_one_or_none()
 
 
+async def unique_user(user: UserCreate, db: Database) -> UserCreate:
+    """
+    Dependency to make sure user being created is unique.
+
+    Raises:
+        Http 409 error if user with user name or email already exists.
+    """
+    result = await db.execute(
+        select(User).where(
+            (User.username == user.username) | (User.email == user.email)
+        )
+    )
+    existing_user = result.scalar_one_or_none()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=409, detail="User with this username or email already exists."
+        )
+
+    return user
+
+
 @user_router.post("", response_model=UserRead)
-async def register_new_user(user: UserCreate, db: Database):
+async def register_new_user(db: Database, user: UserCreate = Depends(unique_user)):
     user = await create_user(db, user)
     return into_pydantic(user, UserRead)
