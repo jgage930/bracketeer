@@ -71,7 +71,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String)
 
     access_level_id: Mapped[int] = mapped_column(
-        ForeignKey("access_levels.id"), unique=True
+        ForeignKey("access_levels.id"),
     )
     access_level: Mapped["AccessLevel"] = relationship(
         "AccessLevel", back_populates="user"

@@ -1,7 +1,7 @@
 [project]
-name = "online-ordering"
+name = "bracketeer"
 version = "0.1.0"
-description = "An online food ordering API."
+description = "Mountain Bike suspension bracketing toolkit."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

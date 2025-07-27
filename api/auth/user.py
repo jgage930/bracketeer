@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from api.auth.encrypt import hash_password
 from api.database import Database, User
+from api.utils import into_pydantic
 
 
 user_router = APIRouter(prefix="/user", tags=["user"])
@@ -20,10 +21,11 @@ class UserRead(BaseModel):
     id: int
     username: str
     email: str
-    access_level: str
+    access_level_id: int
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 # CRUD
@@ -48,4 +50,4 @@ async def get_user(db: AsyncSession, user_id: int) -> User | None:
 @user_router.post("", response_model=UserRead)
 async def register_new_user(user: UserCreate, db: Database):
     user = await create_user(db, user)
-    return UserRead.model_validate(user)
+    return into_pydantic(user, UserRead)
