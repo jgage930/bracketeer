@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from api.auth.encrypt import hash_password
 from api.database import Database, User
-from api.utils import into_pydantic
+from api.utils import into_pydantic, into_pydantic_many
 
 
 user_router = APIRouter(prefix="/user", tags=["user"])
@@ -48,6 +48,11 @@ async def get_user(db: AsyncSession, user_id: int) -> User | None:
     return result.scalar_one_or_none()
 
 
+async def get_all_users(db: AsyncSession) -> list[User]:
+    result = await db.execute(select(User))
+    return result.scalars().all()
+
+
 async def unique_user(user: UserCreate, db: Database) -> UserCreate:
     """
     Dependency to make sure user being created is unique.
@@ -74,3 +79,9 @@ async def unique_user(user: UserCreate, db: Database) -> UserCreate:
 async def register_new_user(db: Database, user: UserCreate = Depends(unique_user)):
     user = await create_user(db, user)
     return into_pydantic(user, UserRead)
+
+
+@user_router.get("", response_model=list[UserRead])
+async def list_users(db: Database):
+    users = await get_all_users(db)
+    return into_pydantic_many(users, UserRead)
