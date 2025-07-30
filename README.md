@@ -3,9 +3,12 @@ A online ordering API where users can order items and save orders.
 
 
 ### Auth
-- Set up users model in the db.
-- Permission Levels: Basic, Admin, Inactive
-- Hash user password
+Todo:
+ - remove access levels.
+ - dependency to protect routes.
+ - refactor into nice module.
+
+
 
 #### Routes
  - Register new user
