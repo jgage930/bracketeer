@@ -15,7 +15,6 @@ async def create_suspension(
     )
 
     db.add(suspension)
-    await db.commit()
-    await db.refresh(suspension)
+    await db.flush()
 
-    return Suspension
+    return suspension

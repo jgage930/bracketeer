@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from enum import Enum
 
 
@@ -9,14 +9,17 @@ class SuspensionType(Enum):
 
 
 class SuspensionFieldCreate(BaseModel):
+    name: str
     min: int
     max: int
     unit: str
 
 
-class SuspensionFieldRead(BaseModel):
+class SuspensionFieldRead(SuspensionFieldCreate):
     id: int
     suspension_id: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SuspensionCreate(BaseModel):
@@ -25,5 +28,8 @@ class SuspensionCreate(BaseModel):
     fields: list[SuspensionFieldCreate]
 
 
-class SuspensionRead(BaseModel):
+class SuspensionRead(SuspensionCreate):
     id: int
+    fields: list[SuspensionFieldRead]
+
+    model_config = ConfigDict(from_attributes=True)
