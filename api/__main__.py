@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 import uvicorn
 from . import __version__
-from .auth.router import auth_router
-from .auth.user import user_router
-from .auth.access import access_router
+from .auth.plugin import AuthPlugin
+from .plugin import add_plugins
 from dotenv import load_dotenv
 
 
@@ -11,9 +10,8 @@ def init_app() -> FastAPI:
     load_dotenv()
 
     app = FastAPI()
-    app.include_router(auth_router)
-    app.include_router(user_router)
-    app.include_router(access_router)
+
+    add_plugins(app, [AuthPlugin()])
 
     return app
 
