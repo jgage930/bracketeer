@@ -1,5 +1,5 @@
-# Online Ordering API
-A online ordering API where users can order items and save orders.
+# Bracketeer
+A tool for mountain bike suspension bracketing.
 
 
 ### Auth
