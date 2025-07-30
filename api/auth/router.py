@@ -4,6 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
+from api.auth.encrypt import hash_password
+from api.auth.user import get_user_by_username
+from api.database import Database
+
 fake_users_db = {
     "johndoe": {
         "username": "johndoe",
@@ -75,13 +79,15 @@ async def get_current_active_user(
 
 
 @auth_router.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user_dict = fake_users_db.get(form_data.username)
-    if not user_dict:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    user = UserInDB(**user_dict)
-    hashed_password = fake_hash_password(form_data.password)
-    if not hashed_password == user.hashed_password:
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Database
+):
+    user = await get_user_by_username(db, form_data.username)
+    if not user:
+        raise HTTPException(status_code=400, detail="User name not found.")
+
+    hashed_password = hash_password(form_data.password)
+    if not hashed_password == user.password_hash:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     return {"access_token": user.username, "token_type": "bearer"}

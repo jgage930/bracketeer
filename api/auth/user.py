@@ -48,6 +48,11 @@ async def get_user(db: AsyncSession, user_id: int) -> User | None:
     return result.scalar_one_or_none()
 
 
+async def get_user_by_username(db: AsyncSession, username: str) -> User | None:
+    result = await db.execute(select(User).where(User.username == username))
+    return result.scalar_one_or_none()
+
+
 async def get_all_users(db: AsyncSession) -> list[User]:
     result = await db.execute(select(User))
     return result.scalars().all()
