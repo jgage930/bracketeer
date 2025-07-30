@@ -12,7 +12,6 @@ from typing import Annotated
 import asyncio
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 DATABASE_URL = "sqlite+aiosqlite:///./data.db"
@@ -23,6 +22,7 @@ class DatabaseException(Exception): ...
 
 engine = create_async_engine(
     DATABASE_URL,
+    echo=True,
     connect_args={"check_same_thread": False},  # needed for SQLite
 )
 Base = declarative_base()
