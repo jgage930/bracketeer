@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 import uvicorn
+
 from . import __version__
 from .auth.plugin import AuthPlugin
+from .suspension.plugin import SuspensionPlugin
 from .plugin import add_plugins
 from dotenv import load_dotenv
 
@@ -11,7 +13,7 @@ def init_app() -> FastAPI:
 
     app = FastAPI()
 
-    add_plugins(app, [AuthPlugin()])
+    add_plugins(app, [AuthPlugin(), SuspensionPlugin()])
 
     return app
 

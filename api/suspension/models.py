@@ -17,13 +17,14 @@ class Suspension(Base):
 
 
 class SuspensionField(Base):
-    __tablename__ = "suspensions"
+    __tablename__ = "suspension_fields"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     suspension_id: Mapped[int] = mapped_column(
         ForeignKey("suspensions.id", ondelete="CASCADE")
     )
 
+    name: Mapped[str] = mapped_column(String())
     min: Mapped[int] = mapped_column(Integer())
     max: Mapped[int] = mapped_column(Integer())
     unit: Mapped[str] = mapped_column(String())
