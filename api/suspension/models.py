@@ -28,4 +28,4 @@ class SuspensionField(Base):
     max: Mapped[int] = mapped_column(Integer())
     unit: Mapped[str] = mapped_column(String())
 
-    suspesion: Mapped["Suspension"] = relationship(back_populates="fields")
+    suspension: Mapped["Suspension"] = relationship(back_populates="fields")
