@@ -1,8 +1,9 @@
+from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from api.database import Database
 from api.auth.schemas import UserRead, UserCreate
-from api.auth.dependencies import unique_user
+from api.auth.dependencies import unique_user, get_current_user
 import api.auth.crud as crud
 
 from api.utils import into_pydantic, into_pydantic_many
@@ -21,3 +22,9 @@ async def register_new_user(db: Database, user: UserCreate = Depends(unique_user
 async def list_users(db: Database):
     users = await crud.get_all_users(db)
     return into_pydantic_many(users, UserRead)
+
+
+@user_router.get("/me", response_model=UserRead)
+async def get_current_user(user: Annotated[dict, Depends(get_current_user)]):
+    print(user)
+    return user
