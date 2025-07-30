@@ -1,37 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
 
-from api.auth.encrypt import hash_password, encode_token, decode_token
-from api.auth.user import get_user_by_username
+from api.auth.encrypt import hash_password, encode_token
 from api.database import Database
-from api.utils import into_pydantic
+from api.auth.crud import get_user_by_username
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 auth_router = APIRouter(tags=["auth"])
-
-
-class CurrentUser(BaseModel):
-    id: int
-    email: str
-    username: str
-
-
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Database):
-    token = decode_token(token)
-    user = await get_user_by_username(db, token["username"])
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return into_pydantic(user, CurrentUser)
 
 
 @auth_router.post("/token")
@@ -48,10 +26,3 @@ async def login(
 
     token = encode_token(user.username)
     return {"access_token": token, "token_type": "bearer"}
-
-
-@auth_router.get("/users/me")
-async def read_users_me(
-    current_user: Annotated[dict, Depends(get_current_user)],
-):
-    return current_user
