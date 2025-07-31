@@ -38,3 +38,11 @@ async def list_all_suspension(db: AsyncSession) -> list[Suspension]:
         select(Suspension).options(selectinload(Suspension.fields))
     )
     return result.scalars().all()
+
+
+async def delete_suspension(db: AsyncSession, suspension_id: int) -> bool:
+    suspension = await get_suspension_by_id(db, suspension_id)
+    if suspension is None:
+        return False
+    await db.delete(suspension)
+    return True

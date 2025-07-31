@@ -6,6 +6,7 @@ from api.suspension.crud import (
     create_suspension,
     get_suspension_by_id,
     list_all_suspension,
+    delete_suspension,
 )
 
 
@@ -35,3 +36,15 @@ async def read_suspension_by_id(id: int, db: Database):
         )
 
     return SuspensionRead.model_validate(suspension)
+
+
+@suspension_router.delete("/{id}")
+async def delete_suspension_by_id(id: int, db: Database):
+    success = await delete_suspension(db, id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No suspension found with id {id}",
+        )
+
+    return {"msg": f"Deleted suspension {id}"}
