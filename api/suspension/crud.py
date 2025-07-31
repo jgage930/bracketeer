@@ -25,8 +25,12 @@ async def create_suspension(
 async def get_suspension_by_id(
     db: AsyncSession, suspension_id: int
 ) -> Suspension | None:
-    result = await db.execute(select(Suspension).where(Suspension.id == suspension_id))
-    return result.scalar_one_or_none()
+    result = await db.execute(
+        select(Suspension)
+        .where(Suspension.id == suspension_id)
+        .options(selectinload(Suspension.fields))
+    )
+    return result.scalars().one_or_none()
 
 
 async def list_all_suspension(db: AsyncSession) -> list[Suspension]:

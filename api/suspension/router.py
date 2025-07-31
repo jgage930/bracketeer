@@ -28,7 +28,7 @@ async def read_all_suspensions(db: Database):
 @suspension_router.get("/{id}")
 async def read_suspension_by_id(id: int, db: Database):
     suspension = await get_suspension_by_id(db, id)
-    if suspension:
+    if not suspension:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"No suspension found with id {id}",
