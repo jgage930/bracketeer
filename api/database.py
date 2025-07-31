@@ -9,9 +9,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import declarative_base
 from typing import Annotated
-import asyncio
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +21,7 @@ class DatabaseException(Exception): ...
 
 engine = create_async_engine(
     DATABASE_URL,
+    echo=True,
     connect_args={"check_same_thread": False},  # needed for SQLite
 )
 Base = declarative_base()
@@ -44,15 +43,3 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 Database = Annotated[AsyncSession, Depends(db_session)]
-
-
-# Migration
-async def migrate_tables() -> None:
-    logger.info("Starting to migrate")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("Done migrating")
-
-
-if __name__ == "__main__":
-    asyncio.run(migrate_tables())
