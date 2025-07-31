@@ -1,18 +1,4 @@
 # Bracketeer
 A tool for mountain bike suspension bracketing.
-
-
-### Auth
-Todo:
- - remove access levels.
- - dependency to protect routes.
- - refactor into nice module.
-
-
-
-#### Routes
- - Register new user
- - login
- - get all users, admin only
-
+Track suspesion runs for multiple bikes, and find the optimal setting for speed or fun!
 
